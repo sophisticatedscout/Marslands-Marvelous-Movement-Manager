@@ -288,21 +288,31 @@
   }
 
   function nextTurn() {
-    if (members.length === 0) return;
-    currentTurn = (currentTurn + 1) % members.length;
-    if (currentTurn === 0) {
-      roundCount += 1;
-    }
-    saveState();
-    updateTable();
+  if (members.length === 0) return;
+
+  currentTurn = (currentTurn + 1) % members.length;
+
+  if (currentTurn === 0) {
+    roundCount += 1;
   }
 
-  function prevTurn() {
-    if (members.length === 0) return;
-    currentTurn = (currentTurn - 1 + members.length) % members.length;
-    saveState();
-    updateTable();
+  saveState();
+  updateTable();
+}
+
+function prevTurn() {
+  if (members.length === 0) return;
+
+  // check if we are at the start of a round before moving back
+  if (currentTurn === 0 && roundCount > 0) {
+    roundCount -= 1;
   }
+
+  currentTurn = (currentTurn - 1 + members.length) % members.length;
+
+  saveState();
+  updateTable();
+}
 
   function resetAll() {
     if (!confirm("Are you sure you want to reset the tracker? This cannot be undone.")) return;
@@ -345,3 +355,4 @@
 </script>
 </body>
 </html>
+
