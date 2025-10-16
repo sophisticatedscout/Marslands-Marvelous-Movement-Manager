@@ -261,6 +261,23 @@
   }
   }
 
+  function promptNameChange(index) {
+  const currentName = members[index].name;
+  const newName = prompt(`Enter a new name for "${currentName}":`, currentName);
+
+  if (newName === null) return; // user cancelled
+  const trimmed = newName.trim();
+  if (trimmed.length === 0) {
+    alert("Name cannot be empty.");
+    return;
+  }
+
+  members[index].name = trimmed;
+  saveState();
+  updateTable();
+  }
+
+
   function addHP(index) {
     const input = document.getElementById(`hpChange-${index}`);
     const delta = parseInt(input.value);
@@ -360,9 +377,10 @@ function prevTurn() {
       row.innerHTML = `
         <td>${index + 1}</td>
         <td>
-          <input type="text" id="nameChange-${index}" value="${member.name}">
-          <button onclick="updateName(${index})">Update</button>
+          ${member.name}
+          <button onclick="promptNameChange(${index})">Edit</button>
         </td>
+
 
         <td>${member.hp}</td>
         <td>
