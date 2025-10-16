@@ -110,6 +110,17 @@
     color: #2c3e50;
   }
 
+  td input[type="text"] {
+  width: 120px;
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
+  margin-right: 6px;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  }
+
+
   td button {
     background-color: var(--accent);
     padding: 6px 10px;
@@ -208,7 +219,6 @@
     updateTable();
   }
 
-
   function saveState() {
     localStorage.setItem('dnd_members', JSON.stringify(members));
     localStorage.setItem('dnd_currentTurn', currentTurn);
@@ -236,6 +246,19 @@
     roundCount = 1;
     saveState();
     updateTable();
+  }
+
+  function updateName(index) {
+  const input = document.getElementById(`nameChange-${index}`);
+  const newName = input.value.trim();
+
+  if (newName) {
+    members[index].name = newName;
+    saveState();
+    updateTable();
+  } else {
+    alert("Name cannot be empty.");
+  }
   }
 
   function addHP(index) {
@@ -287,7 +310,7 @@
     updateTable();
   }
 
-  function nextTurn() {
+function nextTurn() {
   if (members.length === 0) return;
 
   currentTurn = (currentTurn + 1) % members.length;
@@ -336,7 +359,11 @@ function prevTurn() {
 
       row.innerHTML = `
         <td>${index + 1}</td>
-        <td>${member.name}</td>
+        <td>
+          <input type="text" id="nameChange-${index}" value="${member.name}">
+          <button onclick="updateName(${index})">Update</button>
+        </td>
+
         <td>${member.hp}</td>
         <td>
           <input type="number" id="hpChange-${index}" style="width: 60px;" placeholder="+/- HP">
@@ -355,4 +382,5 @@ function prevTurn() {
 </script>
 </body>
 </html>
+
 
