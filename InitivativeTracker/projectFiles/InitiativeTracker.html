@@ -93,7 +93,6 @@
   tr.active-turn {
     background-color: var(--highlight);
     color: #fff;
-    font-weight: bold;
   }
 
   tr:hover {
@@ -119,6 +118,10 @@
   background-color: #ecf0f1;
   color: #2c3e50;
   }
+
+  td input.notes-box {
+  width: 180px;
+}
 
 
   td button {
@@ -172,6 +175,7 @@
     <tr>
       <th>#</th>
       <th>Name</th>
+      <th>Notes</th>
       <th>HP</th>
       <th>Adjust</th>
       <th>Initiative</th>
@@ -225,28 +229,46 @@
     localStorage.setItem('dnd_round', roundCount);
   }
 
-  function addMember() {
-    if (members.length >= 30) {
-      alert("Maximum of 30 members reached.");
-      return;
-    }
-
-    const name = document.getElementById('newName').value.trim();
-    const hp = parseInt(document.getElementById('newHP').value);
-    const init = parseInt(document.getElementById('newInit').value);
-
-    if (!name || isNaN(hp) || isNaN(init)) {
-      alert("Please enter valid name, HP, and initiative.");
-      return;
-    }
-
-    members.push({ name, hp, init });
-    members.sort((a, b) => b.init - a.init);
-    currentTurn = 0;
-    roundCount = 1;
-    saveState();
-    updateTable();
+ function addMember() {
+  if (members.length >= 30) {
+    alert("Maximum of 30 members reached.");
+    return;
   }
+
+  const name = document.getElementById('newName').value.trim();
+  const hp = parseInt(document.getElementById('newHP').value);
+  const init = parseInt(document.getElementById('newInit').value);
+
+  if (!name || isNaN(hp) || isNaN(init)) {
+    alert("Please enter valid name, HP, and initiative.");
+    return;
+  }
+
+  // Remember whose turn it currently is
+  const currentMember = members.length > 0 ? members[currentTurn] : null;
+
+  members.push({
+    name,
+    hp,
+    init,
+    notes: ""
+  });
+
+  members.sort((a, b) => b.init - a.init);
+
+  // Restore current turn after sorting
+  if (currentMember) {
+    currentTurn = members.findIndex(m => m === currentMember);
+  } else {
+    currentTurn = 0;
+  }
+
+  saveState();
+  updateTable();
+
+  // Clear inputs
+  document.getElementById('newName').value = "";
+}
 
   function updateName(index) {
   const input = document.getElementById(`nameChange-${index}`);
@@ -277,6 +299,11 @@
   updateTable();
   }
 
+  function updateNotes(index) {
+    const input = document.getElementById(`notes-${index}`);
+    members[index].notes = input.value;
+    saveState();
+  }
 
   function addHP(index) {
     const input = document.getElementById(`hpChange-${index}`);
@@ -316,7 +343,6 @@
       updateTable();
    }
   }
-
 
   function removeMember(index) {
     members.splice(index, 1);
@@ -380,6 +406,17 @@ function prevTurn() {
           ${member.name}
           <button onclick="promptNameChange(${index})">Edit</button>
         </td>
+
+      <td>
+        <input
+          type="text"
+          id="notes-${index}"
+          value="${member.notes || ""}"
+          placeholder="Notes"
+          style="width:180px;"
+        >
+        <button onclick="updateNotes(${index})">Update</button>
+      </td>
 
 
         <td>${member.hp}</td>
